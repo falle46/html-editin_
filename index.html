@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editin_ | Aplikasi Pengolahan Citra</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .slider {
+      height: 5px;
+      border-radius: 5px;
+      background: #d3d3d3;
+      outline: none;
+    }
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #60a5fa;
+      cursor: pointer;
+    }
+    .slider::-moz-range-thumb {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      background: #60a5fa;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white shadow-sm">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="text-3xl font-bold text-blue-400">Editin_</div>
+      <button id="infoButton" class="text-gray-600 hover:text-blue-500 transition">
+        <i data-lucide="info" class="w-6 h-6"></i>
+      </button>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <div class="mb-8 text-center">
+      <h1 class="text-2xl font-semibold text-gray-800 mb-2">Aplikasi Pengolahan Citra Digital</h1>
+      <p class="text-gray-600">Upload gambar dan edit dengan berbagai fitur pengolahan citra</p>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <div class="mb-6">
+        <label for="imageUpload" class="block text-sm font-medium text-gray-700 mb-2">Upload Gambar</label>
+        <input type="file" id="imageUpload" accept="image/*" class="block w-full text-sm text-gray-500
+          file:mr-4 file:py-2 file:px-4
+          file:rounded-md file:border-0
+          file:text-sm file:font-semibold
+          file:bg-blue-50 file:text-blue-500
+          hover:file:bg-blue-100
+        ">
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h2 class="text-lg font-medium text-gray-800 mb-2">Gambar Asli</h2>
+          <div class="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center h-64">
+            <canvas id="originalCanvas" class="max-w-full max-h-full"></canvas>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-lg font-medium text-gray-800 mb-2">Hasil Pengolahan</h2>
+          <div class="bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center h-64">
+            <canvas id="resultCanvas" class="max-w-full max-h-full"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 class="text-lg font-medium text-gray-800 mb-4">Pengaturan Pengolahan Citra</h2>
+      
+      <div class="space-y-6">
+        <!-- Grayscale -->
+        <div class="flex items-center">
+          <input type="checkbox" id="grayscale" class="w-4 h-4 text-blue-500 rounded focus:ring-blue-400">
+          <label for="grayscale" class="ml-2 text-sm font-medium text-gray-700">Konversi ke Grayscale</label>
+        </div>
+
+        <!-- Brightness -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="brightness" class="text-sm font-medium text-gray-700">Brightness</label>
+            <span id="brightnessValue" class="text-xs text-gray-500">0</span>
+          </div>
+          <input type="range" id="brightness" min="-100" max="100" value="0" class="slider w-full">
+        </div>
+
+        <!-- Contrast -->
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label for="contrast" class="text-sm font-medium text-gray-700">Contrast</label>
+            <span id="contrastValue" class="text-xs text-gray-500">0</span>
+          </div>
+          <input type="range" id="contrast" min="-100" max="100" value="0" class="slider w-full">
+        </div>
+
+        <!-- Median Filter -->
+        <div class="flex items-center">
+          <input type="checkbox" id="medianFilter" class="w-4 h-4 text-blue-500 rounded focus:ring-blue-400">
+          <label for="medianFilter" class="ml-2 text-sm font-medium text-gray-700">Filter Median (Noise Reduction)</label>
+        </div>
+
+        <!-- Smoothing -->
+        <div class="flex items-center">
+          <input type="checkbox" id="smoothing" class="w-4 h-4 text-blue-500 rounded focus:ring-blue-400">
+          <label for="smoothing" class="ml-2 text-sm font-medium text-gray-700">Smoothing (Filter Rerata)</label>
+        </div>
+
+        <!-- Edge Detection -->
+        <div class="flex items-center">
+          <input type="checkbox" id="edgeDetection" class="w-4 h-4 text-blue-500 rounded focus:ring-blue-400">
+          <label for="edgeDetection" class="ml-2 text-sm font-medium text-gray-700">Deteksi Tepi (Sobel)</label>
+        </div>
+
+        <div class="flex justify-center pt-4">
+          <button id="processButton" class="px-6 py-2 bg-blue-500 text-white font-medium rounded-md hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Proses Gambar
+          </button>
+          <button id="downloadButton" class="ml-4 px-6 py-2 bg-gray-200 text-gray-700 font-medium rounded-md hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Unduh Hasil
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-lg font-medium text-gray-800 mb-4">Informasi Pengolahan Citra</h2>
+      <div id="processingInfo" class="text-sm text-gray-600 space-y-4">
+        <p>Pilih operasi pengolahan citra untuk melihat informasi.</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Info -->
+  <div id="infoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">Tentang Editin_</h3>
+          <button id="closeInfoModal" class="text-gray-400 hover:text-gray-500">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div>
+            <h4 class="font-medium text-gray-700 mb-1">Cara Penggunaan</h4>
+            <ol class="list-decimal list-inside text-sm text-gray-600 space-y-1">
+              <li>Upload gambar yang ingin diedit</li>
+              <li>Pilih operasi pengolahan citra yang diinginkan</li>
+              <li>Klik tombol "Proses Gambar" untuk melihat hasil</li>
+              <li>Klik tombol "Unduh Hasil" untuk menyimpan gambar hasil pengolahan</li>
+            </ol>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-700 mb-1">Pemilik Web</h4>
+            <p class="text-sm text-gray-600">Muhammad Falleryan - 065122185</p>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-700 mb-1">Kontak</h4>
+            <p class="text-sm text-gray-600">Instagram: @falleryan</p>
+            <p class="text-sm text-gray-600">Email: falleryan@example.com</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script src="js/imageProcessing.js"></script>
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>
