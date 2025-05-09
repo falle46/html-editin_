@@ -1,4 +1,9 @@
-// DOM Elements
+/**
+ * Editin_ - Aplikasi Pengolahan Citra Web
+ * File aplikasi utama yang menangani interaksi UI dan alur kerja
+ */
+
+// Elemen DOM - Mendapatkan referensi ke semua elemen HTML yang perlu diinteraksikan
 const imageUpload = document.getElementById("imageUpload")
 const originalCanvas = document.getElementById("originalCanvas")
 const resultCanvas = document.getElementById("resultCanvas")
@@ -9,63 +14,64 @@ const infoModal = document.getElementById("infoModal")
 const closeInfoModal = document.getElementById("closeInfoModal")
 const processingInfo = document.getElementById("processingInfo")
 
-// Sliders
+// Slider - Mendapatkan referensi ke elemen slider dan tampilan nilainya
 const brightnessSlider = document.getElementById("brightness")
 const contrastSlider = document.getElementById("contrast")
 const brightnessValue = document.getElementById("brightnessValue")
 const contrastValue = document.getElementById("contrastValue")
 
-// Checkboxes
+// Checkbox - Mendapatkan referensi ke semua checkbox opsi pemrosesan
 const grayscaleCheckbox = document.getElementById("grayscale")
 const medianFilterCheckbox = document.getElementById("medianFilter")
 const smoothingCheckbox = document.getElementById("smoothing")
 const edgeDetectionCheckbox = document.getElementById("edgeDetection")
 
-// Canvas contexts
+// Konteks canvas - Mendapatkan konteks 2D untuk menggambar pada kedua canvas
 const originalCtx = originalCanvas.getContext("2d")
 const resultCtx = resultCanvas.getContext("2d")
 
-// Original image data
+// Data gambar asli - Akan menyimpan gambar yang diunggah
 let originalImage = null
 
-// Image processing functions (stubs - replace with actual implementations)
+// Fungsi pemrosesan gambar (diasumsikan didefinisikan di tempat lain atau diimpor)
+// Untuk demonstrasi, mari kita definisikan fungsi placeholder:
 function convertToGrayscale(imageData) {
-  // Implementation for grayscale conversion
+  // Implementasi placeholder
   return imageData
 }
 
 function adjustBrightnessContrast(imageData, brightness, contrast) {
-  // Implementation for brightness/contrast adjustment
+  // Implementasi placeholder
   return imageData
 }
 
 function applyMedianFilter(imageData) {
-  // Implementation for median filter
+  // Implementasi placeholder
   return imageData
 }
 
 function applyMeanFilter(imageData) {
-  // Implementation for mean filter (smoothing)
+  // Implementasi placeholder
   return imageData
 }
 
 function applyEdgeDetection(imageData) {
-  // Implementation for edge detection
+  // Implementasi placeholder
   return imageData
 }
 
-// Event listeners
+// Event listener - Menyiapkan semua handler event untuk interaksi pengguna
 imageUpload.addEventListener("change", handleImageUpload)
-processButton.addEventListener("change", processImage)
+processButton.addEventListener("click", processImage) // Catatan: Diperbaiki dari "change" menjadi "click"
 downloadButton.addEventListener("click", downloadImage)
 infoButton.addEventListener("click", () => infoModal.classList.remove("hidden"))
 closeInfoModal.addEventListener("click", () => infoModal.classList.add("hidden"))
 
-// Slider event listeners
+// Event listener slider - Memperbarui nilai yang ditampilkan saat slider berubah
 brightnessSlider.addEventListener("input", updateSliderValue)
 contrastSlider.addEventListener("input", updateSliderValue)
 
-// Process image when any control changes
+// Proses gambar saat ada kontrol yang berubah - Kumpulkan semua kontrol ke dalam array
 const controls = [
   brightnessSlider,
   contrastSlider,
@@ -75,7 +81,9 @@ const controls = [
   edgeDetectionCheckbox,
 ]
 
+// Tambahkan event listener ke semua kontrol
 controls.forEach((control) => {
+  // Proses gambar saat nilai kontrol berubah
   control.addEventListener("change", () => {
     if (originalImage) {
       processImage()
@@ -83,7 +91,7 @@ controls.forEach((control) => {
     }
   })
 
-  // For sliders, also update on input
+  // Untuk slider, juga perbarui saat input (saat menyeret)
   if (control.type === "range") {
     control.addEventListener("input", () => {
       if (originalImage) {
@@ -94,7 +102,11 @@ controls.forEach((control) => {
   }
 })
 
-// Handle image upload
+/**
+ * Menangani unggahan gambar dari input file
+ * Fungsi ini dipanggil saat pengguna memilih file gambar
+ * @param {Event} e - Event perubahan dari input file
+ */
 function handleImageUpload(e) {
   const file = e.target.files[0]
   if (!file) return
@@ -103,80 +115,87 @@ function handleImageUpload(e) {
   reader.onload = (event) => {
     const img = new Image()
     img.onload = () => {
-      // Set canvas dimensions
+      // Atur dimensi canvas agar sesuai dengan gambar yang diunggah
       originalCanvas.width = img.width
       originalCanvas.height = img.height
       resultCanvas.width = img.width
       resultCanvas.height = img.height
 
-      // Draw original image
+      // Gambar gambar asli pada canvas pertama
       originalCtx.clearRect(0, 0, originalCanvas.width, originalCanvas.height)
       originalCtx.drawImage(img, 0, 0)
 
-      // Store original image
+      // Simpan gambar asli untuk pemrosesan nanti
       originalImage = img
 
-      // Enable process button
+      // Aktifkan tombol proses sekarang karena sudah ada gambar
       processButton.disabled = false
 
-      // Process image immediately
+      // Proses gambar segera dengan pengaturan default
       processImage()
     }
-    img.src = event.target.result
+    img.src = event.target.result // Atur sumber gambar ke data file
   }
-  reader.readAsDataURL(file)
+  reader.readAsDataURL(file) // Baca file sebagai URL data
 }
 
-// Process image with selected operations
+/**
+ * Proses gambar dengan operasi yang dipilih
+ * Fungsi ini menerapkan semua operasi pemrosesan gambar yang dipilih secara berurutan
+ */
 function processImage() {
   if (!originalImage) return
 
-  // Get image data from original canvas
+  // Dapatkan data gambar dari canvas asli
   const imageData = originalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height)
 
-  // Create a copy of the image data for processing
+  // Buat salinan data gambar untuk pemrosesan
   let processedData = new ImageData(new Uint8ClampedArray(imageData.data), imageData.width, imageData.height)
 
-  // Apply operations in sequence
+  // Terapkan operasi secara berurutan - Urutan penting!
 
-  // 1. Grayscale
+  // 1. Grayscale - Konversi ke grayscale terlebih dahulu jika dipilih
   if (grayscaleCheckbox.checked) {
     processedData = convertToGrayscale(processedData)
   }
 
-  // 2. Brightness and Contrast
+  // 2. Brightness dan Contrast - Terapkan penyesuaian brightness/contrast
   const brightnessValue = Number.parseInt(brightnessSlider.value)
   const contrastValue = Number.parseInt(contrastSlider.value)
   if (brightnessValue !== 0 || contrastValue !== 0) {
     processedData = adjustBrightnessContrast(processedData, brightnessValue, contrastValue)
   }
 
-  // 3. Median Filter
+  // 3. Filter Median - Terapkan pengurangan noise jika dipilih
   if (medianFilterCheckbox.checked) {
     processedData = applyMedianFilter(processedData)
   }
 
-  // 4. Smoothing (Mean Filter)
+  // 4. Smoothing (Filter Rerata) - Terapkan penghalusan jika dipilih
   if (smoothingCheckbox.checked) {
     processedData = applyMeanFilter(processedData)
   }
 
-  // 5. Edge Detection
+  // 5. Deteksi Tepi - Terapkan deteksi tepi terakhir jika dipilih
   if (edgeDetectionCheckbox.checked) {
     processedData = applyEdgeDetection(processedData)
   }
 
-  // Draw processed image on result canvas
+  // Gambar gambar yang telah diproses pada canvas hasil
   resultCtx.putImageData(processedData, 0, 0)
 
-  // Enable download button
+  // Aktifkan tombol unduh sekarang karena sudah ada gambar yang diproses
   downloadButton.disabled = false
 
-  // Update processing info
+  // Perbarui tampilan info pemrosesan
   updateProcessingInfo()
 }
 
-// Update slider value display
+/**
+ * Perbarui tampilan nilai slider
+ * Fungsi ini memperbarui nilai yang ditampilkan untuk slider brightness dan contrast
+ * @param {Event} e - Event input dari slider
+ */
 function updateSliderValue(e) {
   if (e.target.id === "brightness") {
     brightnessValue.textContent = e.target.value
@@ -185,20 +204,28 @@ function updateSliderValue(e) {
   }
 }
 
-// Download processed image
+/**
+ * Unduh gambar yang telah diproses
+ * Fungsi ini membuat tautan unduhan untuk gambar yang telah diproses
+ */
 function downloadImage() {
   if (!resultCanvas.width) return
 
+  // Buat elemen tautan sementara
   const link = document.createElement("a")
-  link.download = "editin_result.png"
-  link.href = resultCanvas.toDataURL("image/png")
-  link.click()
+  link.download = "editin_result.png" // Atur nama file unduhan
+  link.href = resultCanvas.toDataURL("image/png") // Konversi canvas ke URL data
+  link.click() // Simulasikan klik untuk memicu unduhan
 }
 
-// Update processing info based on selected operations
+/**
+ * Perbarui tampilan info pemrosesan
+ * Fungsi ini memperbarui panel informasi dengan detail tentang operasi yang dipilih
+ */
 function updateProcessingInfo() {
   let infoHTML = ""
 
+  // Tambahkan informasi untuk setiap operasi yang dipilih
   if (grayscaleCheckbox.checked) {
     infoHTML += `
       <div>
@@ -245,9 +272,11 @@ function updateProcessingInfo() {
     `
   }
 
+  // Jika tidak ada operasi yang dipilih, tampilkan pesan default
   if (infoHTML === "") {
     infoHTML = "<p>Pilih operasi pengolahan citra untuk melihat informasi.</p>"
   }
 
+  // Perbarui panel info dengan HTML yang dihasilkan
   processingInfo.innerHTML = infoHTML
 }
